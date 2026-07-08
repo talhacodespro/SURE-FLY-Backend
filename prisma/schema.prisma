@@ -1,0 +1,236 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ENUMS
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+// USER
+model User {
+  id            Int       @id @default(autoincrement())
+  fullName      String
+  email         String    @unique
+  phone         String?   @unique
+  avatar        String?
+  password      String
+  isPasswordSet Boolean   @default(false)
+  dob           DateTime?
+  address       String?
+  isActive      Boolean   @default(true)
+  role          UserRole  @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  passports    Passport[]
+  companies    Company[]
+  sales        Sale[]
+  transactions Transaction[]
+  expenses     Expense[]
+}
+
+// PASSPORT
+model Passport {
+  id          Int      @id @default(autoincrement())
+  fullName    String
+  phone       String?
+  email       String?
+  passportNo  String   @unique
+  dob         DateTime
+  expiryDate  DateTime
+  isActive    Boolean  @default(true)
+  remarks     String?
+  createdById Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  createdBy User   @relation(fields: [createdById], references: [id])
+  sales     Sale[]
+}
+
+// COMPANY
+model Company {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  phone        String
+  email        String   @unique
+  contactName  String
+  contactPhone String
+  address      String
+  isActive     Boolean  @default(true)
+  remarks      String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  createdById  Int
+
+  // Relations
+  createdBy     User          @relation(fields: [createdById], references: [id])
+  sales         Sale[]
+  purchaseSales Sale[]        @relation("PurchaseFrom") // purchaseFrom relation
+  transactions  Transaction[]
+}
+
+enum TicketStatus {
+  OPEN
+  USED
+  CANCELLED
+  REFUNDED
+  VOID
+  REISSUED
+}
+
+// TICKET
+model Ticket {
+  id         Int          @id @default(autoincrement())
+  status     TicketStatus @default(OPEN)
+  ticketNo   String       @unique
+  issueDate  DateTime
+  sector     String
+  pnr        String
+  air        String
+  flightDate DateTime
+
+  sale Sale?
+}
+
+// VISA
+
+enum VisaStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+  EXPIRED
+}
+
+model Visa {
+  id       Int        @id @default(autoincrement())
+  country  String
+  visaType String
+  status   VisaStatus @default(PENDING)
+
+  sale Sale?
+}
+
+enum SaleType {
+  TICKET
+  VISA
+}
+
+// SALE
+model Sale {
+  id             Int      @id @default(autoincrement())
+  type           SaleType
+  purchaseAmount Int
+  companyAmount  Int
+  remarks        String?
+  createdById    Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Foreign Keys
+  passportId     Int
+  companyId      Int
+  purchaseFromId Int
+  ticketId       Int? @unique
+  visaId         Int? @unique
+
+  // Relations
+  createdBy    User          @relation(fields: [createdById], references: [id])
+  passport     Passport      @relation(fields: [passportId], references: [id])
+  company      Company       @relation(fields: [companyId], references: [id])
+  purchaseFrom Company       @relation("PurchaseFrom", fields: [purchaseFromId], references: [id])
+  ticket       Ticket?       @relation(fields: [ticketId], references: [id])
+  visa         Visa?         @relation(fields: [visaId], references: [id])
+  transactions Transaction[]
+}
+
+enum TransactionType {
+  INVOICE // Sale create (company owes you)
+  PAYMENT // টাকা দেওয়া বা নেওয়া
+  EXPENSE // খরচ (purchase, office cost)
+  REFUND // টাকা ফেরত
+  TRANSFER // account to account
+  ADJUSTMENT // ভুল ঠিক করা
+}
+
+enum TransactionDirection {
+  CREDIT
+  DEBIT
+}
+
+// Payment Method
+model PaymentMethod {
+  id            Int      @id @default(autoincrement())
+  accountName   String
+  accountNumber String
+  bankName      String
+  balance       Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  transactions Transaction[]
+  expenses     Expense[]
+}
+
+// Expense Category
+model ExpenseCategory {
+  id      Int    @id @default(autoincrement())
+  name    String @unique
+  remarks String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  expenses Expense[]
+}
+
+// EXPENSE
+model Expense {
+  id              Int      @id @default(autoincrement())
+  amount          Int
+  remarks         String
+  categoryId      Int
+  paymentMethodId Int?
+  createdById     Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  category      ExpenseCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  paymentMethod PaymentMethod?  @relation(fields: [paymentMethodId], references: [id])
+  createdBy     User            @relation(fields: [createdById], references: [id])
+  transactions  Transaction[]
+}
+
+// TRANSACTION (Bonus)
+model Transaction {
+  id        Int                  @id @default(autoincrement())
+  type      TransactionType
+  direction TransactionDirection
+  amount    Int
+
+  saleId          Int?
+  companyId       Int?
+  expenseId       Int?
+  paymentMethodId Int?
+
+  createdById Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+  expense       Expense?       @relation(fields: [expenseId], references: [id])
+  sale          Sale?          @relation(fields: [saleId], references: [id])
+  company       Company?       @relation(fields: [companyId], references: [id])
+  createdBy     User           @relation(fields: [createdById], references: [id])
+}

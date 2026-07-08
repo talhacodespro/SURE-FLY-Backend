@@ -1,0 +1,38 @@
+{
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"],
+  "compilerOptions": {
+    "target": "es2019",
+    "module": "commonjs",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  }
+}
+
+// {
+//   "include": ["src", "bin"],
+//   "exclude": ["node_modules"],
+//   "type": "module",
+//   "compilerOptions": {
+//     "target": "es2016",
+//     "module": "commonjs",
+//     "rootDir": "./",
+//     "outDir": "./dist",
+//     "esModuleInterop": true,
+//     "forceConsistentCasingInFileNames": true,
+//     "strict": true,
+//     "skipLibCheck": true,
+//     "baseUrl": "./",
+//     "paths": {
+//       "@/*": ["src/*"]
+//     }
+//   }
+// }
