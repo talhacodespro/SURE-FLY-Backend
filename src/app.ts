@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: 'https://sure-fly-backend.vercel.app/',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   }),
 );
