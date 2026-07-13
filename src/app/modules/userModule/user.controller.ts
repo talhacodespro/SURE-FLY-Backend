@@ -13,7 +13,7 @@ const createUser: RequestHandler = catchAsync(
       message: 'User created successfully',
       data: result,
     });
-  }
+  },
 );
 
 const getUsers: RequestHandler = catchAsync(
@@ -25,7 +25,7 @@ const getUsers: RequestHandler = catchAsync(
       message: 'Users fetched successfully',
       data: result,
     });
-  }
+  },
 );
 
 const getUserById: RequestHandler = catchAsync(
@@ -38,7 +38,7 @@ const getUserById: RequestHandler = catchAsync(
       message: 'User fetched successfully',
       data: result,
     });
-  }
+  },
 );
 
 const updateUser: RequestHandler = catchAsync(
@@ -51,7 +51,7 @@ const updateUser: RequestHandler = catchAsync(
       message: 'User updated successfully',
       data: result,
     });
-  }
+  },
 );
 
 const deleteUser: RequestHandler = catchAsync(
@@ -64,7 +64,7 @@ const deleteUser: RequestHandler = catchAsync(
       message: 'User deleted successfully',
       data: result,
     });
-  }
+  },
 );
 
 const UserController = {
