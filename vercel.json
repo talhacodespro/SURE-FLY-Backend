@@ -1,10 +1,20 @@
 {
   "version": 2,
-  "buildCommand": "pnpm build",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/api/index.js"
+      "src": "dist/src/main.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "dist/src/main.js",
+      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      },
+      "status": 200
     }
   ]
 }

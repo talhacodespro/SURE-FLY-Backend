@@ -10,7 +10,7 @@ const app: Application = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: '*',
+    origin: 'https://sure-fly-backend.vercel.app/',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   }),
